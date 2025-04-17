@@ -19,9 +19,9 @@ jobs:
       - name: Importar chave pública GPG do autor
         run: |
           gpg --import .github/workflows/gpg.key
-          FINGERPRINT=$(gpg --with-colons --import-options show-only --import .github/workflows/gpg.key | grep fpr | cut -d ':' -f 10)
+          FINGERPRINT=$(gpg --with-colons --import-options show-only --import .github/workflows/gpg.key | awk -F: '/^fpr:/ { print $10 }' | head -n 1)
           echo "Fingerprint encontrado: $FINGERPRINT"
-          echo -e "trust-model always\n$FINGERPRINT:6:" | gpg --import-ownertrust
+          echo "$FINGERPRINT:6:" | gpg --import-ownertrust
           
       - name: Validar estrutura de diretórios
         run: |
