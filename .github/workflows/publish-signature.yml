@@ -26,15 +26,29 @@ jobs:
 
       - name: Verificar arquivos de assinatura
         run: |
-          echo "🔍 Validando arquivos..."
+          echo "🔍 Validando arquivos de assinatura..."
           find commits/signatures -type f -name "*.txt" | while read file; do
-            echo "✔️ Encontrado: $file"
-            grep -q "DOCUMENT ID" "$file" || { echo "❌ $file inválido: falta DOCUMENT ID"; exit 1; }
-            grep -q "USER ID" "$file" || { echo "❌ $file inválido: falta USER ID"; exit 1; }
-            grep -q "HASH" "$file" || { echo "❌ $file inválido: falta HASH"; exit 1; }
-            grep -q "SIGNED AT" "$file" || { echo "❌ $file inválido: falta SIGNED AT"; exit 1; }
+            echo "✔️ Validando $file"
+            grep -q "DOCUMENT ID" "$file" || { echo "❌ Falta DOCUMENT ID em $file"; exit 1; }
+            grep -q "USER ID" "$file" || { echo "❌ Falta USER ID em $file"; exit 1; }
+            grep -q "HASH" "$file" || { echo "❌ Falta HASH em $file"; exit 1; }
+            grep -q "SIGNED AT" "$file" || { echo "❌ Falta SIGNED AT em $file"; exit 1; }
           done
 
-      - name: Log de conclusão
+      - name: Verificar commits assinados (GPG ou SSH)
         run: |
-          echo "✅ Todos os arquivos de assinatura estão válidos."
+          echo "🔐 Verificando se os commits são assinados..."
+          UNSIGNED=$(git log -1 --pretty=format:"%G?" | grep -v "G")
+          if [ -n "$UNSIGNED" ]; then
+            echo "❌ O último commit não está assinado! Commits devem ser assinados com GPG ou SSH."
+            exit 1
+          fi
+          echo "✅ Commit assinado corretamente."
+
+      - name: Log dos últimos commits (auditoria)
+        run: |
+          echo "📜 Log dos últimos 5 commits:"
+          git log -n 5 --pretty=format:"🔸 %h | %an | %G? | %s" --abbrev-commit
+
+      - name: Conclusão
+        run: echo "✅ Workflow finalizado com sucesso!"
