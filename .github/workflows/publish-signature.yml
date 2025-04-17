@@ -1,26 +1,40 @@
-name: Publish Signature to Blockchain Repo
+name: Verify and Publish Signature
 
 on:
   push:
+    branches:
+      - main
     paths:
       - 'commits/signatures/**'
 
 jobs:
-  validate-and-commit:
+  verify-and-publish:
+    name: Verificar e Publicar Assinatura
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
+      - name: Checkout do código
         uses: actions/checkout@v3
 
-      - name: Set up Git
+      - name: Validar estrutura de diretórios
         run: |
-          git config --global user.name "expochain-bot"
-          git config --global user.email "bot@expochain.cc"
+          echo "📁 Verificando estrutura em commits/signatures..."
+          if [ ! -d "commits/signatures" ]; then
+            echo "❌ Pasta commits/signatures não encontrada!"
+            exit 1
+          fi
 
-      - name: Validate Commit (basic)
+      - name: Verificar arquivos de assinatura
         run: |
-          echo "Verificando arquivos de assinatura..."
-          ls commits/signatures/
+          echo "🔍 Validando arquivos..."
+          find commits/signatures -type f -name "*.txt" | while read file; do
+            echo "✔️ Encontrado: $file"
+            grep -q "DOCUMENT ID" "$file" || { echo "❌ $file inválido: falta DOCUMENT ID"; exit 1; }
+            grep -q "USER ID" "$file" || { echo "❌ $file inválido: falta USER ID"; exit 1; }
+            grep -q "HASH" "$file" || { echo "❌ $file inválido: falta HASH"; exit 1; }
+            grep -q "SIGNED AT" "$file" || { echo "❌ $file inválido: falta SIGNED AT"; exit 1; }
+          done
 
-      - name: Confirm Success
-        run: echo "✔️ Assinatura publicada com sucesso"
+      - name: Log de conclusão
+        run: |
+          echo "✅ Todos os arquivos de assinatura estão válidos."
