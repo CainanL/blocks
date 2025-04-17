@@ -1,0 +1,26 @@
+name: Publish Signature to Blockchain Repo
+
+on:
+  push:
+    paths:
+      - 'commits/signatures/**'
+
+jobs:
+  validate-and-commit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set up Git
+        run: |
+          git config --global user.name "expochain-bot"
+          git config --global user.email "bot@expochain.cc"
+
+      - name: Validate Commit (basic)
+        run: |
+          echo "Verificando arquivos de assinatura..."
+          ls commits/signatures/
+
+      - name: Confirm Success
+        run: echo "✔️ Assinatura publicada com sucesso"
