@@ -20,8 +20,12 @@ jobs:
         run: |
           gpg --import .github/workflows/gpg.key
 
-          KEY_ID=$(gpg --list-keys --with-colons | grep pub | cut -d':' -f5)
-          echo -e "5\ny\n" | gpg --command-fd 0 --edit-key "$KEY_ID" trust
+          KEY_ID=$(gpg --list-keys --with-colons | grep '^pub' | cut -d':' -f5)
+
+          echo "Setting trust level to ultimate for key: $KEY_ID"
+
+          echo "$KEY_ID:6:" | gpg --import-ownertrust
+        continue-on-error: false
 
       - name: Validar estrutura de diretórios
         run: |
@@ -30,7 +34,7 @@ jobs:
             echo "❌ Pasta commits/signatures não encontrada!"
             exit 1
           fi
-          
+
       - name: Exibir assinatura do último commit
         run: git log -1 --show-signature
 
