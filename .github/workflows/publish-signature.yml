@@ -20,6 +20,9 @@ jobs:
         run: |
           gpg --import .github/workflows/gpg.key
 
+          KEY_ID=$(gpg --list-keys --with-colons | grep pub | cut -d':' -f5)
+          echo -e "5\ny\n" | gpg --command-fd 0 --edit-key "$KEY_ID" trust
+
       - name: Validar estrutura de diretórios
         run: |
           echo "📁 Verificando estrutura em commits/signatures..."
