@@ -18,7 +18,7 @@ jobs:
 
       - name: Importar chave pública GPG do autor
         run: |
-          echo "$GPG_PUBLIC_KEY" | gpg --import
+          printf "%s\n" "$GPG_PUBLIC_KEY" | gpg --import
         env:
           GPG_PUBLIC_KEY: |
             -----BEGIN PGP PUBLIC KEY BLOCK-----
