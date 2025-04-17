@@ -1,0 +1,16 @@
+[user]
+	name = João Paulo Biesek
+	email = joaopaulobiesek@gmail.com
+    signingkey = joaopaulobiesek@gmail.com
+
+[commit]
+	gpgsign = true
+
+[gpg]
+	program = /opt/homebrew/bin/gpg
+
+[core]
+	editor = code --wait
+
+[init]
+	defaultBranch = main
