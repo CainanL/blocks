@@ -23,6 +23,9 @@ jobs:
             echo "❌ Pasta commits/signatures não encontrada!"
             exit 1
           fi
+          
+      - name: Exibir assinatura do último commit
+        run: git log -1 --show-signature
 
       - name: Verificar arquivos de assinatura
         run: |
