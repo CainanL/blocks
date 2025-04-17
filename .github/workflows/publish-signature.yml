@@ -20,12 +20,10 @@ jobs:
         run: |
           gpg --import .github/workflows/gpg.key
 
-          KEY_ID=$(gpg --list-keys --with-colons | grep '^pub' | cut -d':' -f5)
+          FINGERPRINT=$(gpg --list-keys --with-colons | awk -F: '/^fpr:/ { print $10; exit }')
 
-          echo "Setting trust level to ultimate for key: $KEY_ID"
-
-          echo "$KEY_ID:6:" | gpg --import-ownertrust
-        continue-on-error: false
+          echo "Fingerprint encontrado: $FINGERPRINT"
+          echo "$FINGERPRINT:6:" | gpg --import-ownertrust
 
       - name: Validar estrutura de diretórios
         run: |
